@@ -1,0 +1,63 @@
+<!doctype html><html lang="th"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#12304a"><link rel="manifest" href="manifest.json">
+<title>Gas Shop PT</title>
+<style>
+:root{--n:#12304a;--b:#1677a8;--bg:#f3f7fa;--line:#d5e0e7;--ink:#193247}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,sans-serif}
+header{background:linear-gradient(120deg,#102d46,#1677a8);color:white;padding:22px 16px 28px;border-radius:0 0 22px 22px}
+.top,main{max-width:980px;margin:auto}.top{display:flex;align-items:center;justify-content:space-between}.brand{display:flex;gap:12px;align-items:center}.logo{width:44px;height:44px;border:1px solid #ffffff66;border-radius:13px;display:grid;place-items:center;font-weight:900;background:#ffffff18}
+h1{font-size:20px;margin:0}header p{margin:4px 0 0;color:#d9edf7;font-size:12px}main{padding:18px 13px 35px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}.stat,.panel{background:white;border:1px solid var(--line);border-radius:15px;box-shadow:0 7px 24px #17364d10}
+.stat{padding:12px}.stat small{font-size:11px;color:#6b7f8d}.stat strong{display:block;font-size:24px;color:var(--n)}
+button{border:0;border-radius:10px;padding:11px 14px;font:inherit;font-size:13px;font-weight:750;cursor:pointer}.primary{background:var(--b);color:white}.secondary{background:white;color:var(--n);border:1px solid var(--line)}.danger{background:#fff0ef;color:#b42318}
+.toolbar{display:flex;gap:8px;margin:16px 0 11px;flex-wrap:wrap}.search{display:grid;grid-template-columns:1fr 170px;gap:8px;margin-bottom:12px}
+input,select{width:100%;padding:12px;border:1px solid #cbd8e1;border-radius:10px;background:white;font:inherit;font-size:14px;color:var(--ink)}
+.panel{overflow:hidden}.panelhead{padding:14px 15px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between}.panelhead h2{font-size:15px;margin:0}.count,.note{font-size:11px;color:#6b7f8d}
+.tablewrap{overflow:auto}table{border-collapse:collapse;width:100%;min-width:760px;font-size:13px}th,td{padding:11px;border:1px solid var(--line);text-align:left}th{background:#eaf3f8;color:#23465e}tbody tr:nth-child(even) td{background:#f8fbfd}
+.pill{display:inline-block;border-radius:30px;padding:5px 9px;font-size:11px;font-weight:800;white-space:nowrap}.ok{background:#e4f5eb;color:#16834a}.wait{background:#fff4d9;color:#a96b00}.bad{background:#fde9e7;color:#b42318}.cancel{background:#edf0f2;color:#586773}
+.mini{padding:7px 9px;font-size:11px;margin-right:3px}.empty{text-align:center;padding:30px;color:#6b7f8d}
+.back{position:fixed;inset:0;background:#0b2034aa;display:none;align-items:flex-end;justify-content:center;padding:10px;z-index:5}.back.show{display:flex}.modal{background:white;border-radius:18px;width:min(580px,100%);padding:17px;max-height:94vh;overflow:auto}.modal h2{margin:0 0 14px;font-size:18px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:11px}.field label{display:block;font-size:12px;font-weight:800;color:#4d6575;margin-bottom:5px}.full{grid-column:1/-1}.qrrow{display:flex;gap:7px}.qrrow button{white-space:nowrap}.thumb{width:58px;height:58px;object-fit:cover;border:1px solid var(--line);border-radius:8px}.formactions{display:flex;gap:8px;margin-top:16px}.formactions button{flex:1}
+.note{line-height:1.6;margin:12px 2px}.toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:#17364d;color:white;padding:11px 16px;border-radius:12px;display:none;z-index:10}
+@media(min-width:650px){.back{align-items:center}.modal{border-radius:18px}}@media(max-width:430px){h1{font-size:17px}.search{grid-template-columns:1fr}.grid{grid-template-columns:1fr}.full{grid-column:auto}.stat{padding:10px}.stat strong{font-size:21px}.toolbar button{flex:1}}
+</style></head><body>
+<header><div class="top"><div class="brand"><div class="logo">PT</div><div><h1>Gas Shop PT</h1><p>ระบบบันทึกข้อมูลถังแก๊ส</p></div></div><button id="install" class="secondary" hidden>ติดตั้งแอป</button></div></header>
+<main>
+<div class="stats"><div class="stat"><small>รายการทั้งหมด</small><strong id="total">0</strong></div><div class="stat"><small>รบจ</small><strong id="done">0</strong></div><div class="stat"><small>HUB</small><strong id="pending">0</strong></div></div>
+<div class="toolbar"><button class="primary" id="add">＋ เพิ่มรายการ</button><button class="secondary" id="export">⇩ ส่งออก Excel</button><button class="secondary" id="help">วิธีติดตั้ง</button></div>
+<div class="search"><input id="q" placeholder="ค้นหาสาขา / พนักงาน / เลขหูถัง / QR"><select id="filter"><option value="">ทุกสถานะ</option><option>รบจ</option><option>HUB</option></select></div>
+<section class="panel"><div class="panelhead"><h2>รายการบันทึก</h2><span class="count" id="count">0 รายการ</span></div><div class="tablewrap"><table><thead><tr><th>วันที่</th><th>ชื่อสาขา</th><th>ชื่อพนักงาน</th><th>รูปเลขหูถัง</th><th>รูป QR</th><th>สถานะ</th><th>จัดการ</th></tr></thead><tbody id="rows"></tbody></table><div class="empty" id="empty">ยังไม่มีข้อมูล กด “เพิ่มรายการ” เพื่อเริ่มบันทึก</div></div></section>
+<p class="note">ข้อมูลเก็บในอุปกรณ์เครื่องนี้ แนะนำส่งออก Excel สำรองไว้เป็นระยะ หากเปลี่ยนเครื่องหรือล้างข้อมูลเบราว์เซอร์ ข้อมูลอาจหายได้</p>
+</main>
+<div class="back" id="back"><div class="modal"><h2 id="title">เพิ่มรายการใหม่</h2><form id="form"><input type="hidden" id="id"><div class="grid">
+<div class="field"><label>วันที่</label><input type="date" id="date" required></div>
+<div class="field"><label>ชื่อสาขา</label><input id="branch" placeholder="เช่น PT บ้านม่วง" required></div>
+<div class="field"><label>ชื่อพนักงาน</label><input id="staff" placeholder="ชื่อ-นามสกุล" required></div>
+<div class="field"><label>รูปเลขหูถัง</label><input id="earImage" type="file" accept="image/*" capture="environment"></div>
+<div class="field"><label>รูปคิวอาร์โค้ด (QR)</label><input id="qrImage" type="file" accept="image/*" capture="environment"></div>
+<div class="field full"><label>สถานะ</label><select id="status"><option>รบจ</option><option>HUB</option></select></div></div>
+<div class="formactions"><button type="button" class="secondary" id="cancel">ยกเลิก</button><button class="primary">บันทึกข้อมูล</button></div></form><p class="note">สแกน QR ต้องใช้เบราว์เซอร์ที่รองรับและอนุญาตกล้อง โดยเปิดผ่าน HTTPS</p></div></div><div class="toast" id="toast"></div>
+<script>
+const $=x=>document.getElementById(x),KEY='gasshop_pt_records_v1';let data=JSON.parse(localStorage.getItem(KEY)||'[]'),installPrompt=null;
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function say(s){$('toast').textContent=s;$('toast').style.display='block';setTimeout(()=>$('toast').style.display='none',2200)}
+function cls(s){return s==='รบจ'?'ok':'wait'}
+function thdate(s){if(!s)return '';let [y,m,d]=s.split('-');return `${d}/${m}/${y}`}
+function render(){ $('total').textContent=data.length;$('done').textContent=data.filter(x=>x.status==='รบจ').length;$('pending').textContent=data.filter(x=>x.status==='HUB').length;
+let q=$('q').value.toLowerCase().trim(),f=$('filter').value,items=data.filter(x=>(!f||x.status===f)&&[x.branch,x.staff,x.date,x.status].join(' ').toLowerCase().includes(q));
+$('count').textContent=items.length+' รายการ';$('empty').style.display=items.length?'none':'block';
+$('rows').innerHTML=items.map(x=>`<tr><td>${thdate(x.date)}</td><td>${esc(x.branch)}</td><td>${esc(x.staff)}</td><td>${x.earImage?`<img class="thumb" src="${x.earImage}" alt="รูปเลขหูถัง">`:'-'}</td><td>${x.qrImage?`<img class="thumb" src="${x.qrImage}" alt="รูป QR">`:'-'}</td><td><span class="pill ${cls(x.status)}">${esc(x.status)}</span></td><td><button class="secondary mini" onclick="edit('${x.id}')">แก้ไข</button><button class="danger mini" onclick="del('${x.id}')">ลบ</button></td></tr>`).join('')}
+function persist(){localStorage.setItem(KEY,JSON.stringify(data));render()}
+function readImage(file){return new Promise((resolve,reject)=>{if(!file){resolve(null);return}const reader=new FileReader();reader.onload=()=>resolve(reader.result);reader.onerror=reject;reader.readAsDataURL(file)})}
+function open(x){$('form').reset();$('id').value=x?.id||'';$('title').textContent=x?'แก้ไขรายการ':'เพิ่มรายการใหม่';$('date').value=x?.date||new Date().toISOString().slice(0,10);$('branch').value=x?.branch||'';$('staff').value=x?.staff||'';$('status').value=(x?.status==='HUB'?'HUB':'รบจ');$('back').classList.add('show')}
+function close(){ $('back').classList.remove('show') }
+$('add').onclick=()=>open();$('cancel').onclick=close;$('back').onclick=e=>{if(e.target===$('back'))close()};
+$('form').onsubmit=async e=>{e.preventDefault();let id=$('id').value||String(Date.now()),old=data.find(a=>a.id===id);const earImage=await readImage($('earImage').files[0]),qrImage=await readImage($('qrImage').files[0]);let x={id,date:$('date').value,branch:$('branch').value.trim(),staff:$('staff').value.trim(),earImage:earImage||old?.earImage||null,qrImage:qrImage||old?.qrImage||null,status:$('status').value},i=data.findIndex(a=>a.id===id);if(i<0)data.unshift(x);else data[i]=x;try{persist();close();say('บันทึกข้อมูลแล้ว')}catch(err){alert('พื้นที่จัดเก็บรูปอาจเต็ม กรุณาใช้รูปขนาดเล็กลง')}};
+window.edit=id=>open(data.find(x=>x.id===id));window.del=id=>{if(confirm('ยืนยันการลบรายการนี้?')){data=data.filter(x=>x.id!==id);persist();say('ลบรายการแล้ว')}};
+$('q').oninput=render;$('filter').onchange=render;
+$('export').onclick=()=>{let rows=[['วันที่','ชื่อสาขา','ชื่อพนักงาน','รูปเลขหูถัง','รูป QR','สถานะ'],...data.map(x=>[thdate(x.date),x.branch,x.staff,x.earImage?'มีรูป':'ไม่มีรูป',x.qrImage?'มีรูป':'ไม่มีรูป',x.status])];let csv='\ufeff'+rows.map(r=>r.map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(',')).join('\r\n'),url=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'})),a=document.createElement('a');a.href=url;a.download='GasShop_PT_records.csv';a.click();URL.revokeObjectURL(url);say('ส่งออกไฟล์สำหรับเปิดใน Excel แล้ว')};
+$('help').onclick=()=>alert('ก่อนติดตั้ง ต้องนำไฟล์ชุดนี้ไปวางบนเว็บโฮสติ้งที่รองรับ HTTPS\\nAndroid: เปิดเว็บด้วย Chrome > เมนู ⋮ > ติดตั้งแอป/เพิ่มลงในหน้าจอหลัก\\niPhone: เปิดด้วย Safari > แชร์ > เพิ่มไปยังหน้าจอโฮม');
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();installPrompt=e;$('install').hidden=false});$('install').onclick=async()=>{if(installPrompt){installPrompt.prompt();installPrompt=null;$('install').hidden=true}};
+if('serviceWorker'in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('./sw.js').catch(()=>{});render();
+</script></body></html>
